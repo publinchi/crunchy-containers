@@ -13,14 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#
-# this example creates the metrics backends with NFS volumes
-# for storing their data
-#
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 $DIR/cleanup.sh
 
-expenv -f $DIR/metrics-pod.json | ${CCP_CLI?} create -f -
-expenv -f $DIR/pgsql-pod.json | ${CCP_CLI?} create -f -
+expenv -f $DIR/metrics.json | ${CCP_CLI?} create -f -
+expenv -f $DIR/pgsql.json | ${CCP_CLI?} create -f -
