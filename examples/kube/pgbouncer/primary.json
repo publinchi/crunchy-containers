@@ -51,6 +51,24 @@
                         "protocol": "TCP"
                     }
                 ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "/opt/cpm/bin/readiness.sh"
+                        ]
+                    },
+                    "initialDelaySeconds": 40,
+                    "timeoutSeconds": 1
+                },
+                "livenessProbe": {
+                    "exec": {
+                        "command": [
+                            "/opt/cpm/bin/liveness.sh"
+                        ]
+                    },
+                    "initialDelaySeconds": 40,
+                    "timeoutSeconds": 1
+                },
                 "env": [
                     {
                         "name": "PG_PRIMARY_USER",
@@ -62,7 +80,12 @@
                     },
                     {
                         "name": "PG_PRIMARY_PASSWORD",
-                        "value": "password"
+                        "valueFrom": {
+                            "secretKeyRef": {
+                                "name": "pgsql-secrets",
+                                "key": "pg-primary-password"
+                            }
+                        }
                     },
                     {
                         "name": "PG_PRIMARY_PORT",
@@ -74,7 +97,12 @@
                     },
                     {
                         "name": "PG_PASSWORD",
-                        "value": "password"
+                        "valueFrom": {
+                            "secretKeyRef": {
+                                "name": "pgsql-secrets",
+                                "key": "pg-password"
+                            }
+                        }
                     },
                     {
                         "name": "PG_DATABASE",
@@ -82,7 +110,21 @@
                     },
                     {
                         "name": "PG_ROOT_PASSWORD",
-                        "value": "password"
+                        "valueFrom": {
+                            "secretKeyRef": {
+                                "name": "pgsql-secrets",
+                                "key": "pg-root-password"
+                            }
+                        }
+                    },
+                    {
+                        "name": "PGBOUNCER_PASSWORD",
+                        "valueFrom": {
+                            "secretKeyRef": {
+                                "name": "pgbouncer-secrets",
+                                "key": "pgbouncer-password"
+                            }
+                        }
                     }
                 ],
                 "readinessProbe": {

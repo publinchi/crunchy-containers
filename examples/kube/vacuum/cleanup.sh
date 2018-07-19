@@ -12,4 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-${CCP_CLI?} delete job vacuum
+source ${CCPROOT}/examples/common.sh
+echo_info "Cleaning up.."
+
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} job vacuum

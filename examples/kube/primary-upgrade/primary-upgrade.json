@@ -23,24 +23,6 @@
 }
 
 {
-    "kind": "PersistentVolumeClaim",
-    "apiVersion": "v1",
-    "metadata": {
-      "name": "primary-upgrade-pgdata"
-    },
-    "spec": {
-      "accessModes": [
-        "ReadWriteMany"
-      ],
-      "resources": {
-        "requests": {
-          "storage": "400M"
-        }
-      }
-    }
-}
-
-{
     "kind": "Pod",
     "apiVersion": "v1",
     "metadata": {

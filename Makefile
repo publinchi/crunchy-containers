@@ -65,16 +65,14 @@ pgadmin4: versiontest
 	docker tag crunchy-pgadmin4 $(CCP_IMAGE_PREFIX)/crunchy-pgadmin4:$(CCP_BASEOS)-$(CCP_PG_FULLVERSION)-$(CCP_VERSION)
 
 pgbadger: versiontest
-	cd badger && godep go install badgerserver.go
-	cp $(GOBIN)/badgerserver bin/pgbadger
+	docker build -t $(CCP_IMAGE_PREFIX)/badgerserver:build -f $(CCP_BASEOS)/Dockerfile.badgerserver.$(CCP_BASEOS) .
+	docker create --name extract $(CCP_IMAGE_PREFIX)/badgerserver:build
+	docker cp extract:/go/src/github.com/crunchydata/badgerserver/badgerserver ./bin/pgbadger/badgerserver
+	docker rm -f extract
 	docker build -t crunchy-pgbadger -f $(CCP_BASEOS)/$(CCP_PGVERSION)/Dockerfile.pgbadger.$(CCP_BASEOS) .
 	docker tag crunchy-pgbadger $(CCP_IMAGE_PREFIX)/crunchy-pgbadger:$(CCP_BASEOS)-$(CCP_PG_FULLVERSION)-$(CCP_VERSION)
 
 pgbouncer: versiontest
-	cp `which oc` bin/pgbouncer
-	cp `which kubectl` bin/pgbouncer
-	cd bounce && godep go install bounce.go
-	cp $(GOBIN)/bounce bin/pgbouncer/
 	docker build -t crunchy-pgbouncer -f $(CCP_BASEOS)/$(CCP_PGVERSION)/Dockerfile.pgbouncer.$(CCP_BASEOS) .
 	docker tag crunchy-pgbouncer $(CCP_IMAGE_PREFIX)/crunchy-pgbouncer:$(CCP_BASEOS)-$(CCP_PG_FULLVERSION)-$(CCP_VERSION)
 
@@ -87,8 +85,8 @@ pgpool:	versiontest
 	docker tag crunchy-pgpool $(CCP_IMAGE_PREFIX)/crunchy-pgpool:$(CCP_BASEOS)-$(CCP_PG_FULLVERSION)-$(CCP_VERSION)
 
 pgrestore: versiontest
-	docker build -t crunchy-restore -f $(CCP_BASEOS)/$(CCP_PGVERSION)/Dockerfile.pgrestore.$(CCP_BASEOS) .
-	docker tag crunchy-restore $(CCP_IMAGE_PREFIX)/crunchy-restore:$(CCP_BASEOS)-$(CCP_PG_FULLVERSION)-$(CCP_VERSION)
+	docker build -t crunchy-pgrestore -f $(CCP_BASEOS)/$(CCP_PGVERSION)/Dockerfile.pgrestore.$(CCP_BASEOS) .
+	docker tag crunchy-pgrestore $(CCP_IMAGE_PREFIX)/crunchy-pgrestore:$(CCP_BASEOS)-$(CCP_PG_FULLVERSION)-$(CCP_VERSION)
 
 pgsim:
 	cd sim && make
@@ -117,6 +115,14 @@ upgrade: versiontest
 		docker build -t crunchy-upgrade -f $(CCP_BASEOS)/$(CCP_PGVERSION)/Dockerfile.upgrade.$(CCP_BASEOS) . ;\
 		docker tag crunchy-upgrade $(CCP_IMAGE_PREFIX)/crunchy-upgrade:$(CCP_BASEOS)-$(CCP_PG_FULLVERSION)-$(CCP_VERSION) ;\
 	fi
+
+sample-app: versiontest
+	docker build -t $(CCP_IMAGE_PREFIX)/sample-app-build:build -f $(CCP_BASEOS)/Dockerfile.sample-app-build.$(CCP_BASEOS) .
+	docker create --name extract $(CCP_IMAGE_PREFIX)/sample-app-build:build
+	docker cp extract:/go/src/github.com/crunchydata/sample-app/sample-app ./bin/sample-app
+	docker rm -f extract
+	docker build -t crunchy-sample-app -f $(CCP_BASEOS)/Dockerfile.sample-app.$(CCP_BASEOS) .
+	docker tag crunchy-sample-app $(CCP_IMAGE_PREFIX)/crunchy-sample-app:$(CCP_BASEOS)-$(CCP_PG_FULLVERSION)-$(CCP_VERSION)
 
 vac: versiontest
 	cd vacuum && godep go install vacuum.go

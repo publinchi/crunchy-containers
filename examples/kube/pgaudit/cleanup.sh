@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-${CCP_CLI?} delete service pgaudit
-${CCP_CLI?} delete pod pgaudit
+source ${CCPROOT}/examples/common.sh
+echo_info "Cleaning up.."
 
-$CCPROOT/examples/waitforterm.sh pgaudit ${CCP_CLI?}
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} service pgaudit
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pod pgaudit
+
+$CCPROOT/examples/waitforterm.sh pgaudit ${CCP_CLI?} ${CCP_NAMESPACE}

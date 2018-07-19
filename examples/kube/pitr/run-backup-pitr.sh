@@ -12,11 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+source ${CCPROOT}/examples/common.sh
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-${CCP_CLI?} delete pvc backup-pitr-pgdata
-${CCP_CLI?} delete job backup-pitr
+echo_info "Cleaning up.."
 
-expenv -f $DIR/backup-pitr.json | ${CCP_CLI?} create -f -
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pvc backup-pitr-pgdata
+if [ -z "$CCP_STORAGE_CLASS" ]; then
+  ${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pv backup-pitr-pgdata
+fi
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} job backup-pitr
+
+create_storage "backup-pitr"
+if [[ $? -ne 0 ]]
+then
+    echo_err "Failed to create storage, exiting.."
+    exit 1
+fi
+
+expenv -f $DIR/backup-pitr.json | ${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} -f -

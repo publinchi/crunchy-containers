@@ -1,40 +1,4 @@
 {
-    "kind": "PersistentVolumeClaim",
-    "apiVersion": "v1",
-    "metadata": {
-      "name": "upgrade-pgnewdata"
-    },
-    "spec": {
-      "accessModes": [
-        "ReadWriteMany"
-      ],
-      "resources": {
-        "requests": {
-          "storage": "400M"
-        }
-      }
-    }
-}
-
-{
-    "kind": "PersistentVolumeClaim",
-    "apiVersion": "v1",
-    "metadata": {
-      "name": "upgrade-pgolddata"
-    },
-    "spec": {
-      "accessModes": [
-        "ReadWriteMany"
-      ],
-      "resources": {
-        "requests": {
-          "storage": "400M"
-        }
-      }
-    }
-}
-
-{
     "apiVersion": "batch/v1",
     "kind": "Job",
     "metadata": {

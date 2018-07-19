@@ -15,7 +15,7 @@
 
 echo "Cleaning up..."
 
-CONTAINER_NAME=pgbouncer
-
-docker stop $CONTAINER_NAME
-docker rm -v $CONTAINER_NAME
+docker stop pgbouncer-primary pgbouncer-replica pg-primary pg-replica
+docker rm -v pgbouncer-primary pgbouncer-replica pg-primary pg-replica
+docker network rm pgnet
+docker volume rm pg-primary pg-replica

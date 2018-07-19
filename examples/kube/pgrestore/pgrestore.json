@@ -1,22 +1,4 @@
 {
-    "kind": "PersistentVolumeClaim",
-    "apiVersion": "v1",
-    "metadata": {
-      "name": "pgrestore-pgdata"
-    },
-    "spec": {
-      "accessModes": [
-        "ReadWriteMany"
-      ],
-      "resources": {
-        "requests": {
-          "storage": "400M"
-        }
-      }
-    }
-  }
-
-  {
      "apiVersion":"batch/v1",
      "kind":"Job",
      "metadata":{
@@ -35,7 +17,7 @@
                  {
                     "name":"pgdata",
                     "persistentVolumeClaim":{
-                       "claimName":"pgrestore-pgdata"
+                       "claimName":"pgdump-pgdata"
                     }
                  }
               ],
@@ -45,12 +27,12 @@
               "containers":[
                  {
                     "name":"pgrestore",
-                    "image":"$CCP_IMAGE_PREFIX/crunchy-restore:$CCP_IMAGE_TAG",
+                    "image":"$CCP_IMAGE_PREFIX/crunchy-pgrestore:$CCP_IMAGE_TAG",
                     "volumeMounts":[
                        {
                           "mountPath":"/pgdata",
                           "name":"pgdata",
-                          "readOnly":false
+                          "readOnly":true
                        }
                     ],
                     "env":[
@@ -69,22 +51,6 @@
                        {
                           "name":"PGRESTORE_PASS",
                           "value":"password"
-                       },
-                       {
-                          "name":"PGRESTORE_PORT",
-                          "value":"5432"
-                       },
-                       {
-                          "name":"PGRESTORE_VOLUMEPATH",
-                          "value":"/pgdata/$PGDUMP_HOST-dumps/$PGDUMP_PATH"
-                       },
-                       {
-                          "name":"PGRESTORE_FILE",
-                          "value":"pgdumpall.sql"
-                       },
-                       {
-                          "name":"PGRESTORE_FORMAT",
-                          "value":"p"
                        }
                     ]
                  }
@@ -93,4 +59,4 @@
            }
         }
      }
-  }
+}

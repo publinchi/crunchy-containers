@@ -1,14 +1,14 @@
-FROM registry.access.redhat.com/rhel
+FROM registry.access.redhat.com/rhel7
 
 MAINTAINER Crunchy Data <support@crunchydata.com>
 
 LABEL name="crunchydata/pgadmin4" \
         vendor="crunchy data" \
       	PostgresVersion="10" \
-      	PostgresFullVersion="10.3" \
+      	PostgresFullVersion="10.4" \
         version="7.3" \
-        release="1.8.2" \
-        #build-date="2017-05-11" \
+        release="2.0" \
+        #build-date="2018-07-11" \
         url="https://crunchydata.com" \
         summary="Crunchy Data pgAdmin4 GUI utility" \
         description="Provides GUI for the pgAdmin utility." \
@@ -20,9 +20,9 @@ LABEL name="crunchydata/pgadmin4" \
         io.openshift.expose-services="" \
         io.openshift.tags="crunchy,database"
 
-COPY docs/atomic/pgadmin4/help.1 /help.1
-COPY docs/atomic/pgadmin4/help.md /help.md
-COPY docs/licenses /licenses
+COPY conf/atomic/pgadmin4/help.1 /help.1
+COPY conf/atomic/pgadmin4/help.md /help.md
+COPY conf/licenses /licenses
 
 ENV PGVERSION="10"
 
@@ -44,7 +44,7 @@ RUN yum -y update \
     openssl \
     procps-ng \
     mod_wsgi mod_ssl \
- && yum --enablerepo rhel-7-server-extras-rpms -y install pgadmin4-v2-web \
+ && yum --enablerepo rhel-7-server-extras-rpms -y install pgadmin4-web \
  && yum -y install postgresql10-devel postgresql10-server \
  && yum -y clean all
 

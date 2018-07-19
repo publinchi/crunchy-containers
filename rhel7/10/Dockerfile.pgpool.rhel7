@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/rhel
+FROM registry.access.redhat.com/rhel7
 
 MAINTAINER Crunchy Data <support@crunchydata.com>
 
@@ -6,9 +6,9 @@ LABEL name="crunchydata/pgpool" \
         vendor="crunchy data" \
         version="7.3" \
       	PostgresVersion="10" \
-      	PostgresFullVersion="10.3" \
-        release="1.8.2" \
-        #build-date="2017-05-11" \
+      	PostgresFullVersion="10.4" \
+        release="2.0" \
+        #build-date="2018-07-11" \
         url="https://crunchydata.com" \
         summary="Contains the pgpool utility as a PostgreSQL-aware load balancer" \
         description="Offers a smart load balancer in front of a Postgres cluster, sending writes only to the primary and reads to the replica(s). This allows an application to only have a single connection point when interacting with a Postgres cluster." \
@@ -20,9 +20,9 @@ LABEL name="crunchydata/pgpool" \
         io.openshift.expose-services="" \
         io.openshift.tags="crunchy,database"
 
-COPY docs/atomic/pgpool/help.1 /help.1
-COPY docs/atomic/pgpool/help.md /help.md
-COPY docs/licenses /licenses
+COPY conf/atomic/pgpool/help.1 /help.1
+COPY conf/atomic/pgpool/help.md /help.md
+COPY conf/licenses /licenses
 
 ENV PGVERSION="10"
 

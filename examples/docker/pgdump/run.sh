@@ -13,33 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo "starting backup container..."
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 $DIR/cleanup.sh
 
-CONTAINER_NAME=pgdump
-VOLUME_NAME=$CONTAINER_NAME-volume
-#
-# this example assumes you have the basic example running
-#
-HOST_TO_BACKUP=basic
-
-docker volume create --driver local --name=$VOLUME_NAME
+docker network create --driver bridge pgnet
 
 docker run \
-	--privileged=true \
-	-v $VOLUME_NAME:/pgdata \
-	-e PGDUMP_HOST=$HOST_TO_BACKUP \
-	-e PGDUMP_DB=postgres \
-	-e PGDUMP_USER=postgres\
-	-e PGDUMP_PASS=password \
-	-e PGDUMP_PORT=5432 \
-	-e PGDUMP_LABEL=mybackup \
-	-e PGDUMP_FORMAT=plain \
-	-e PGDUMP_VERBOSE=true \
-	-e PGDUMP_ALL=true \
-	--link $HOST_TO_BACKUP:$HOST_TO_BACKUP\
-	--name=$CONTAINER_NAME \
-	--hostname=$CONTAINER_NAME \
-	-d $CCP_IMAGE_PREFIX/crunchy-pgdump:$CCP_IMAGE_TAG
+    -v backups:/pgdata \
+    -e PGDUMP_HOST=primary \
+    -e PGDUMP_DB=postgres \
+    -e PGDUMP_USER=postgres\
+    -e PGDUMP_PASS=password \
+    --name=pgdump \
+    --hostname=pgdump \
+    --network=pgnet \
+    -d $CCP_IMAGE_PREFIX/crunchy-pgdump:$CCP_IMAGE_TAG

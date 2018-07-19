@@ -12,8 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-${CCP_CLI?} delete service primary
-${CCP_CLI?} delete pod primary
-${CCP_CLI?} delete pvc primary-pgdata
-${CCP_CLI?} delete pv primary
+source ${CCPROOT}/examples/common.sh
+echo_info "Cleaning up.."
+
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} service primary
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pod primary
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pvc primary-pgdata
+
+if [ -z "$CCP_STORAGE_CLASS" ]; then
+    ${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pv primary-pgdata
+fi
+
 $CCPROOT/examples/waitforterm.sh primary ${CCP_CLI?}
+
+dir_check_rm "primary"

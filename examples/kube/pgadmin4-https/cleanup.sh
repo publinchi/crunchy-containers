@@ -12,13 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-${CCP_CLI?} delete service pgadmin4-https
-${CCP_CLI?} delete pod pgadmin4-https
-${CCP_CLI?} delete secret pgadmin4-https-secrets
-${CCP_CLI?} delete secret pgadmin4-https-tls
+source ${CCPROOT}/examples/common.sh
 
-${CCP_CLI?} delete pvc pgadmin4-https-data
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo_info "Cleaning up.."
 
-rm -f ./server.crt ./server.key ./privkey.pem
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} service pgadmin4-https
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pod pgadmin4-https
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} secret pgadmin4-https-secrets
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} secret pgadmin4-https-tls
 
-$CCPROOT/examples/waitforterm.sh pgadmin4 ${CCP_CLI?}
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pvc pgadmin4-https-data
+
+if [ -z "$CCP_STORAGE_CLASS" ]; then
+  ${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pv pgadmin4-https-data
+fi
+
+rm -f ${DIR?}/server.crt ${DIR?}/server.key ${DIR?}/privkey.pem
+
+$CCPROOT/examples/waitforterm.sh pgadmin4-https ${CCP_CLI?}
+
+file_check_rm "access_log"
+file_check_rm "config_local.py"
+file_check_rm "error_log"
+file_check_rm "pgadmin4.db"
+file_check_rm "pgadmin4.conf"
+file_check_rm "pgadmin.log"
+file_check_rm "sessions"
+file_check_rm "storage"

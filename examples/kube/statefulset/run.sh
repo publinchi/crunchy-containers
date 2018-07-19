@@ -12,20 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+source ${CCPROOT}/examples/common.sh
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-$DIR/cleanup.sh
+${DIR}/cleanup.sh
 
-# as of Kube 1.6, we need to allow the service account to perform
-# a label command, for this example, we open up wide permissions
-# for all serviceaccounts, this is NOT for production!
-${CCP_CLI?} create clusterrolebinding statefulset-sa \
+create_storage "statefulset"
+if [[ $? -ne 0 ]]
+then
+    echo_err "Failed to create storage, exiting.."
+    exit 1
+fi
+
+# As of Kube 1.6, it is necessary to allow the service account to perform
+# a label command. For this example, we open up wide permissions
+# for all serviceaccounts. This is NOT for production!
+
+${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} clusterrolebinding statefulset-sa \
   --clusterrole=cluster-admin \
   --user=admin \
   --user=kubelet \
   --group=system:serviceaccounts \
   --namespace=$CCP_NAMESPACE
 
-expenv -f $DIR/statefulset.json | ${CCP_CLI?} create -f -
+expenv -f $DIR/statefulset.json | ${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} -f -

@@ -12,18 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+source ${CCPROOT}/examples/common.sh
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-$DIR/cleanup.sh
+${DIR}/cleanup.sh
 
-openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -days 5 -nodes -subj '/CN=localhost'
+create_storage "pgadmin4-https"
+if [[ $? -ne 0 ]]
+then
+    echo_err "Failed to create storage, exiting.."
+    exit 1
+fi
 
-${CCP_CLI?} create secret generic pgadmin4-https-secrets \
+openssl req -x509 -newkey rsa:4096 -keyout ${DIR?}/server.key -out ${DIR?}/server.crt -days 5 -nodes -subj '/CN=localhost'
+
+${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} secret generic pgadmin4-https-secrets \
     --from-literal=pgadmin-email='admin@admin.com' \
     --from-literal=pgadmin-password='password'
 
-${CCP_CLI?} create secret generic pgadmin4-https-tls \
+${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} secret generic pgadmin4-https-tls \
     --from-file=pgadmin-cert=${DIR?}/server.crt \
     --from-file=pgadmin-key=${DIR?}/server.key
 
-expenv -f $DIR/pgadmin4-https.json | ${CCP_CLI?} create -f -
+expenv -f $DIR/pgadmin4-https.json | ${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} -f -

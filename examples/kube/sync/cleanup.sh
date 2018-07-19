@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-${CCP_CLI?} delete pod replicasync replicaasync
-${CCP_CLI?} delete pod primarysync
-${CCP_CLI?} delete service primarysync
-${CCP_CLI?} delete service replicasync
+source ${CCPROOT}/examples/common.sh
+echo_info "Cleaning up.."
+
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pod replicasync replicaasync
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pod primarysync
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} service primarysync
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} service replicasync
 $CCPROOT/examples/waitforterm.sh primarysync ${CCP_CLI?}
 $CCPROOT/examples/waitforterm.sh replicasync ${CCP_CLI?}

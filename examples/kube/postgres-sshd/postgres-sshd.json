@@ -8,60 +8,27 @@
         }
     },
     "spec": {
-        "ports": [{
-            "name": "pgsql",
-            "protocol": "TCP",
-            "port": 5432,
-            "targetPort": 5432,
-            "nodePort": 0
-  }, {
-            "name": "sshd",
-            "protocol": "TCP",
-            "port": 2022,
-            "targetPort": 2022,
-            "nodePort": 0
-  }],
+        "ports": [
+            {
+                "name": "pgsql",
+                "protocol": "TCP",
+                "port": 5432,
+                "targetPort": 5432,
+                "nodePort": 0
+            },
+            {
+                "name": "sshd",
+                "protocol": "TCP",
+                "port": 2022,
+                "targetPort": 2022,
+                "nodePort": 0
+            }
+        ],
         "selector": {
             "name": "postgres-sshd"
         },
         "type": "ClusterIP",
         "sessionAffinity": "None"
-    }
-}
-
-{
-    "kind": "PersistentVolumeClaim",
-    "apiVersion": "v1",
-    "metadata": {
-      "name": "postgres-sshd-backrestrepo"
-    },
-    "spec": {
-      "accessModes": [
-        "ReadWriteMany"
-      ],
-      "resources": {
-        "requests": {
-          "storage": "400M"
-        }
-      }
-    }
-}
-
-{
-    "kind": "PersistentVolumeClaim",
-    "apiVersion": "v1",
-    "metadata": {
-      "name": "postgres-sshd-pgdata"
-    },
-    "spec": {
-      "accessModes": [
-        "ReadWriteMany"
-      ],
-      "resources": {
-        "requests": {
-          "storage": "400M"
-        }
-      }
     }
 }
 
@@ -75,7 +42,9 @@
         }
     },
     "spec": {
-        "securityContext": { $CCP_SECURITY_CONTEXT },
+        "securityContext": {
+            $CCP_SECURITY_CONTEXT 
+        },
         "containers": [
             {
                 "name": "pgsql",
@@ -90,6 +59,20 @@
                         "protocol": "TCP"
                     }
                 ],
+                "readinessProbe": {
+                    "tcpSocket": {
+                        "port": 2022
+                    },
+                    "initialDelaySeconds": 20,
+                    "periodSeconds": 10
+                },
+                "livenessProbe": {
+                    "tcpSocket": {
+                        "port": 2022
+                    },
+                    "initialDelaySeconds": 15,
+                    "periodSeconds": 20
+                },
                 "env": [
                     {
                         "name": "PG_PRIMARY_USER",

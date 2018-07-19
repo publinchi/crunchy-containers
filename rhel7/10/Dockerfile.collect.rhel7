@@ -1,14 +1,14 @@
-FROM registry.access.redhat.com/rhel
+FROM registry.access.redhat.com/rhel7
 
 MAINTAINER Crunchy Data <support@crunchydata.com>
 
 LABEL name="crunchydata/collect" \
         vendor="crunchy data" \
       	PostgresVersion="10" \
-      	PostgresFullVersion="10.3" \
+      	PostgresFullVersion="10.4" \
         version="7.3" \
-        release="1.8.2" \
-        #build-date="2017-05-11" \
+        release="2.0" \
+        #build-date="2018-07-11" \
         url="https://crunchydata.com" \
         summary="Provides metrics for crunchy-postgres" \
         description="Run with crunchy-postgres, crunchy-collect reads the Postgres data directory and has a SQL interface to a database to allow for metrics collection. Used in conjunction with crunchy-prometheus and crunchy-grafana." \
@@ -20,9 +20,9 @@ LABEL name="crunchydata/collect" \
         io.openshift.expose-services="" \
         io.openshift.tags="crunchy,database"
 
-COPY docs/atomic/collect/help.1 /help.1
-COPY docs/atomic/collect/help.md /help.md
-COPY docs/licenses /licenses
+COPY conf/atomic/collect/help.1 /help.1
+COPY conf/atomic/collect/help.md /help.md
+COPY conf/licenses /licenses
 
 ENV PGVERSION="10"
 

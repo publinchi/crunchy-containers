@@ -12,15 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+source ${CCPROOT}/examples/common.sh
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-$DIR/cleanup.sh
+${DIR}/cleanup.sh
 
-${CCP_CLI?} create configmap primary-deployment-pgconf \
-  --from-file=./configs/postgresql.conf \
-  --from-file=pghba=./configs/pg_hba.conf \
-  --from-file=./configs/setup.sql
+create_storage "primary-deployment"
+if [[ $? -ne 0 ]]
+then
+    echo_err "Failed to create storage, exiting.."
+    exit 1
+fi
 
-expenv -f $DIR/primary-deployment.json | ${CCP_CLI?} create -f -
+${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} configmap primary-deployment-pgconf \
+  --from-file ${DIR?}/configs/postgresql.conf \
+  --from-file ${DIR?}/configs/pg_hba.conf \
+  --from-file ${DIR?}/configs/setup.sql
+
+expenv -f $DIR/primary-deployment.json | ${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} -f -

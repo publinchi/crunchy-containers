@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-${CCP_CLI?} delete secret pguser-secret pgprimary-secret pgroot-secret
-${CCP_CLI?} delete pod secret
-${CCP_CLI?} delete service secret
+source ${CCPROOT}/examples/common.sh
+echo_info "Cleaning up.."
+
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} secret pguser-secret pgprimary-secret pgroot-secret
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} pod secret
+${CCP_CLI?} delete --namespace=${CCP_NAMESPACE?} service secret

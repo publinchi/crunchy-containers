@@ -12,20 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo "This example depends on the primary-replica example being run prior!"
+source ${CCPROOT}/examples/common.sh
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 $DIR/cleanup.sh
 
-${CCP_CLI?} create secret generic pgpool-secrets \
+echo_warn "This example depends on the primary-replica example being run prior!"
+echo_info "Creating the example components.."
+
+${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} secret generic pgpool-secrets \
 	--from-file=$DIR/configs/pool_hba.conf \
 	--from-file=$DIR/configs/pgpool.conf \
 	--from-file=$DIR/configs/pool_passwd
 
-${CCP_CLI?} create configmap pgpool-pgconf \
-	--from-file=./configs/pgpool.conf \
-	--from-file=hba=./configs/pool_hba.conf \
-	--from-file=psw=./configs/pool_passwd
+${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} configmap pgpool-pgconf \
+	--from-file=$DIR/configs/pgpool.conf \
+	--from-file=hba=$DIR/configs/pool_hba.conf \
+	--from-file=psw=$DIR/configs/pool_passwd
 
-expenv -f $DIR/pgpool.json | ${CCP_CLI?} create -f -
+expenv -f $DIR/pgpool.json | ${CCP_CLI?} create --namespace=${CCP_NAMESPACE?} -f -

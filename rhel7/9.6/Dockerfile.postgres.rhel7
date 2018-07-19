@@ -1,14 +1,14 @@
-FROM registry.access.redhat.com/rhel
+FROM registry.access.redhat.com/rhel7
 
 MAINTAINER Crunchy Data <support@crunchydata.com>
 
 LABEL name="crunchydata/postgres" \
         vendor="crunchy data" \
       	PostgresVersion="9.6" \
-      	PostgresFullVersion="9.6.8" \
+      	PostgresFullVersion="9.6.9" \
         version="7.3" \
-        release="1.8.2" \
-        #build-date="2017-05-11" \
+        release="2.0" \
+        #build-date="2018-07-11" \
         url="https://crunchydata.com" \
         summary="PostgreSQL 9.6 (PGDG) on a RHEL7 base image" \
         description="Allows multiple deployment methods for PostgreSQL, including basic single primary, streaming replication with synchronous and asynchronous replicas, and stateful sets. Includes utilities for Auditing (pgaudit), statement tracking, and Backup / Restore (pgbackrest, pg_basebackup)." \
@@ -20,9 +20,9 @@ LABEL name="crunchydata/postgres" \
         io.openshift.expose-services="" \
         io.openshift.tags="crunchy,database"
 
-COPY docs/atomic/postgres/help.1 /help.1
-COPY docs/atomic/postgres/help.md /help.md
-COPY docs/licenses /licenses
+COPY conf/atomic/postgres/help.1 /help.1
+COPY conf/atomic/postgres/help.md /help.md
+COPY conf/licenses /licenses
 
 ENV PGVERSION="9.6"
 

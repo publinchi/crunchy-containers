@@ -13,26 +13,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo "starting pgbouncer container...."
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-"$DIR"/cleanup.sh
+${DIR?}/cleanup.sh
 
-CONTAINER_NAME=pgbouncer
+docker network create --driver bridge pgnet
 
-sudo chcon -Rt svirt_sandbox_file_t "$DIR"
+docker run \
+    -p 6432:6432 \
+    --env-file=${DIR?}/env/pgbouncer-primary.list \
+    --network=pgnet \
+    --name='pgbouncer-primary' \
+    --hostname='pgbouncer-primary' \
+    -d ${CCP_IMAGE_PREFIX?}/crunchy-pgbouncer:${CCP_IMAGE_TAG?}
 
-sudo docker run \
-	-v "$DIR":/pgconf \
-	-p 12005:5432 \
-	--privileged \
-	-e PG_PRIMARY_SERVICE=primary \
-	-e PG_REPLICA_SERVICE=replica \
-	-e PG_PRIMARY_PORT=5432 \
-	-e PG_PRIMARY_USER=primaryuser \
-	-e PG_DATABASE=postgres \
-	--link primary:primary \
-	--link replica:replica \
-	--name=$CONTAINER_NAME \
-	--hostname=$CONTAINER_NAME \
-	-d ${CCP_IMAGE_PREFIX}/crunchy-pgbouncer:$CCP_IMAGE_TAG
+docker run \
+    -p 6433:6432 \
+    --env-file=${DIR?}/env/pgbouncer-replica.list \
+    --network=pgnet \
+    --name='pgbouncer-replica' \
+    --hostname='pgbouncer-replica' \
+    -d ${CCP_IMAGE_PREFIX?}/crunchy-pgbouncer:${CCP_IMAGE_TAG?}
+
+docker run \
+    -p 5432:5432 \
+    -v pg-primary:/pgdata \
+    --network=pgnet \
+    --env-file=${DIR?}/env/pgsql-primary.list \
+    --name=pg-primary \
+    --hostname=pg-primary \
+    -d ${CCP_IMAGE_PREFIX?}/crunchy-postgres:${CCP_IMAGE_TAG?}
+
+docker run \
+    -p 5433:5432 \
+    -v pg-replica:/pgdata \
+    --network=pgnet \
+    --env-file=${DIR?}/env/pgsql-replica.list \
+    --name=pg-replica \
+    --hostname=pg-replica \
+    -d ${CCP_IMAGE_PREFIX?}/crunchy-postgres:${CCP_IMAGE_TAG?}
+
+exit 0

@@ -1,40 +1,4 @@
 {
-    "kind": "PersistentVolumeClaim",
-    "apiVersion": "v1",
-    "metadata": {
-        "name": "backrest-pgdata"
-    },
-    "spec": {
-        "accessModes": [
-            "ReadWriteMany"
-        ],
-        "resources": {
-            "requests": {
-                "storage": "400M"
-            }
-        }
-    }
-}
-
-{
-    "kind": "PersistentVolumeClaim",
-    "apiVersion": "v1",
-    "metadata": {
-        "name": "backrest-backrestrepo"
-    },
-    "spec": {
-        "accessModes": [
-            "ReadWriteMany"
-        ],
-        "resources": {
-            "requests": {
-                "storage": "400M"
-            }
-        }
-    }
-}
-
-{
     "kind": "Service",
     "apiVersion": "v1",
     "metadata": {
@@ -80,6 +44,24 @@
                     "privileged": false
                 },
                 "image": "$CCP_IMAGE_PREFIX/crunchy-postgres:$CCP_IMAGE_TAG",
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "/opt/cpm/bin/readiness.sh"
+                        ]
+                    },
+                    "initialDelaySeconds": 40,
+                    "timeoutSeconds": 1
+                },
+                "livenessProbe": {
+                    "exec": {
+                        "command": [
+                            "/opt/cpm/bin/liveness.sh"
+                        ]
+                    },
+                    "initialDelaySeconds": 40,
+                    "timeoutSeconds": 1
+                },
                 "ports": [
                     {
                         "containerPort": 5432,
